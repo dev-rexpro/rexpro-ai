@@ -1,5 +1,5 @@
 <script>
-	import { REXPRO_BASE_URL } from "$lib/constants";
+	import { TWEMOJI_CDN } from "$lib/constants";
 	import { shortCodesToEmojis } from "$lib/stores";
 
 	export let shortCode;
@@ -8,7 +8,7 @@
 
 {#if $shortCodesToEmojis[shortCode]}
 	<img
-		src="{REXPRO_BASE_URL}/assets/emojis/{$shortCodesToEmojis[
+		src="{TWEMOJI_CDN}/{$shortCodesToEmojis[
 			shortCode
 		].toLowerCase()}.svg"
 		alt={shortCode}
