@@ -18,7 +18,7 @@ COPY frontend/ ./
 # Build the frontend using Vite
 # We set NODE_OPTIONS to limit Node's heap memory to prevent it from OOMing
 ENV NODE_OPTIONS="--max-old-space-size=4096"
-RUN VITE_API_URL="" npm run build
+RUN VITE_API_URL="" npx vite build
 
 # ==============================================================================
 # Stage 2: Final image combining python backend and frontend static assets
