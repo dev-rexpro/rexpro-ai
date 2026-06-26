@@ -4,7 +4,7 @@ node_modules
 .pnp.js
 
 # Build output
-build/
+# (build/ is untracked here so we can commit pre-built static files)
 
 # Environment
 .env

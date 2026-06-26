@@ -84,23 +84,26 @@ To run the application locally in development mode:
 
 ## Production Deployment with Docker
 
-The root `Dockerfile` employs a multi-stage compilation pipeline designed to serve both the frontend and backend efficiently from a single port while mitigating memory exhaustion (OOM) spikes.
+To avoid CPU-starvation and memory-exhaustion (OOM) hangs when compiling the Svelte/Vite frontend in resource-restricted cloud environments, the project uses a pre-built static deployment strategy. The frontend is compiled locally, committed to Git, and copied directly into the Docker image.
 
-### Memory Optimization Features
-* **Constrained Node Heap**: Limits Vite builder memory usage to 4096MB using `NODE_OPTIONS="--max-old-space-size=4096"` to prevent Node compiler crashes during heavy asset bundling.
-* **CPU-Only PyTorch**: Installs CPU wheels for PyTorch to avoid massive CUDA overhead.
-* **Throttled uv Installer**: Limits concurrent downloads and builds (`UV_CONCURRENT_BUILDS=1`) to minimize memory spikes.
-* **Single Worker Process**: Sets `UVICORN_WORKERS=1` to prevent multiple Python workers from loading ML models redundantly into memory.
-* **Single-threaded Computations**: Restricts OpenMP and BLAS threading limits to 1 to reduce context-switching overhead and memory thrashing.
+### Building and Deploying
 
-### Building and Running the Image
+1. **Build the Frontend Locally**:
+   Ensure you are in the `frontend/` directory and run:
+   ```bash
+   cd frontend
+   VITE_API_URL="" npm run build
+   ```
+   This compiles the static assets into `frontend/build/`. Commit this folder to Git before pushing.
 
-1. **Build the Docker Image**:
+2. **Build the Docker Image**:
+   From the root directory:
    ```bash
    docker build -t rexpro-ai:latest .
    ```
+   This will create a lightweight Python container and copy the pre-built `frontend/build/` directly, finishing the build in seconds.
 
-2. **Run the Container**:
+3. **Run the Container**:
    ```bash
    docker run -d -p 7860:7860 \
      -e REXPRO_SECRET_KEY="your_secure_random_key" \
@@ -108,3 +111,4 @@ The root `Dockerfile` employs a multi-stage compilation pipeline designed to ser
      rexpro-ai:latest
    ```
    The application will be accessible at `http://localhost:7860`.
+

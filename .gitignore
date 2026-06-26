@@ -9,9 +9,8 @@ ENV/
 env/
 
 # Build outputs
-build/
+/build/
 dist/
-frontend/build/
 frontend/dist/
 
 # Local configuration and environment files

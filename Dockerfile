@@ -1,28 +1,4 @@
 # syntax=docker/dockerfile:1
-
-# ==============================================================================
-# Stage 1: Build the Svelte static frontend
-# ==============================================================================
-FROM node:20-slim AS frontend-builder
-WORKDIR /app/frontend
-
-# Copy frontend packages and lock file
-COPY frontend/package*.json ./
-
-# Install dependencies and limit memory usage to prevent OOM
-RUN npm ci --no-audit --no-fund
-
-# Copy frontend source files
-COPY frontend/ ./
-
-# Build the frontend using Vite
-# We set NODE_OPTIONS to limit Node's heap memory to prevent it from OOMing
-ENV NODE_OPTIONS="--max-old-space-size=4096"
-RUN VITE_API_URL="" npx vite build
-
-# ==============================================================================
-# Stage 2: Final image combining python backend and frontend static assets
-# ==============================================================================
 FROM python:3.11-slim-bookworm
 
 ARG USE_CUDA=false
@@ -109,9 +85,8 @@ RUN chmod +x /app/backend/start.sh
 # Create placeholder CHANGELOG.md (required by rexpro_ai/env.py)
 RUN printf '# Changelog\n' > /app/backend/rexpro_ai/CHANGELOG.md
 
-# Copy built frontend assets from the builder stage
-# Svelte config adapter pages & assets output to 'build' folder in frontend
-COPY --from=frontend-builder /app/frontend/build /app/build
+# Copy pre-built frontend static assets directly from build context
+COPY frontend/build /app/build
 
 EXPOSE 7860
 
