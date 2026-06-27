@@ -1395,7 +1395,7 @@ app.add_middleware(RedirectMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(CommitSessionMiddleware)
 app.add_middleware(AuthTokenMiddleware, fastapi_app=app)
-app.add_middleware(WebsocketUpgradeGuardMiddleware)
+# app.add_middleware(WebsocketUpgradeGuardMiddleware)
 
 
 app.add_middleware(
@@ -2975,7 +2975,15 @@ async def check_db_health():
 
 # --- static assets & files ---
 # Serve build-time static assets (CSS, JS, images, favicon, etc.)
-app.mount('/static', StaticFiles(directory=STATIC_DIR), name='static')
+class CustomStaticFiles(StaticFiles):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        frontend_static_dir = os.path.join(FRONTEND_BUILD_DIR, 'static')
+        if os.path.exists(frontend_static_dir):
+            if frontend_static_dir not in self.all_directories:
+                self.all_directories.append(frontend_static_dir)
+
+app.mount('/static', CustomStaticFiles(directory=STATIC_DIR), name='static')
 
 
 @app.get('/cache/{path:path}')

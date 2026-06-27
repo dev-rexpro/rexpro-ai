@@ -644,11 +644,10 @@ async def get_models(request: Request, url_idx: int | None = None, user=Depends(
             except aiohttp.ClientError as e:
                 # ClientError covers all aiohttp requests issues
                 log.exception(f'Client error: {str(e)}')
-                raise HTTPException(status_code=500, detail='rexpro-ai: Server Connection Error')
+                return {'data': []}
             except Exception as e:
                 log.exception(f'Unexpected error: {e}')
-                error_detail = f'Unexpected error: {str(e)}'
-                raise HTTPException(status_code=500, detail=error_detail)
+                return {'data': []}
 
     if user.role == 'user' and not BYPASS_MODEL_ACCESS_CONTROL:
         models['data'] = await get_filtered_models(models, user)

@@ -68,7 +68,7 @@ if WEBSOCKET_MANAGER == 'redis':
     sio = socketio.AsyncServer(
         cors_allowed_origins=SOCKETIO_CORS_ORIGINS,
         async_mode='asgi',
-        transports=(['websocket'] if ENABLE_WEBSOCKET_SUPPORT else ['polling']),
+        transports=(['polling', 'websocket'] if ENABLE_WEBSOCKET_SUPPORT else ['polling']),
         allow_upgrades=ENABLE_WEBSOCKET_SUPPORT,
         always_connect=True,
         client_manager=redis_manager,
@@ -81,7 +81,7 @@ else:
     sio = socketio.AsyncServer(
         cors_allowed_origins=SOCKETIO_CORS_ORIGINS,
         async_mode='asgi',
-        transports=(['websocket'] if ENABLE_WEBSOCKET_SUPPORT else ['polling']),
+        transports=(['polling', 'websocket'] if ENABLE_WEBSOCKET_SUPPORT else ['polling']),
         allow_upgrades=ENABLE_WEBSOCKET_SUPPORT,
         always_connect=True,
         logger=WEBSOCKET_SERVER_LOGGING,
