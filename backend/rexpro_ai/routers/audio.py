@@ -450,9 +450,12 @@ async def _tts_elevenlabs(request, payload, file_path, file_body_path, user):
             },
             ssl=AIOHTTP_CLIENT_SESSION_SSL,
         ) as r:
-            r.raise_for_status()
+            if r.status != 200:
+                await _raise_tts_error(None, r)
             await _write_tts_cache(file_path, await r.read(), file_body_path, payload)
         return FileResponse(file_path)
+    except HTTPException:
+        raise
     except Exception as exc:
         log.exception(exc)
         await _raise_tts_error(exc, r)
@@ -485,9 +488,12 @@ async def _tts_azure(request, payload, file_path, file_body_path, user):
             data=ssml,
             ssl=AIOHTTP_CLIENT_SESSION_SSL,
         ) as r:
-            r.raise_for_status()
+            if r.status != 200:
+                await _raise_tts_error(None, r)
             await _write_tts_cache(file_path, await r.read(), file_body_path, payload)
         return FileResponse(file_path)
+    except HTTPException:
+        raise
     except Exception as exc:
         log.exception(exc)
         await _raise_tts_error(exc, r)
